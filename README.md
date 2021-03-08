@@ -1,2 +1,2 @@
 # Sudoku
-Simple sudoku with GUI and with sudoku solver.
+Simple sudoku solver with backtracking method.
