@@ -1,38 +1,79 @@
-import pygame
+import time
 
-pygame.init()
 
-width = 540
-height = 650
-square = 60
+sudoku_board = [
+    [0, 0, 0, 1, 0, 0, 0, 9, 0],
+    [7, 0, 0, 0, 0, 0, 1, 2, 6],
+    [2, 0, 0, 0, 4, 0, 0, 0, 0],
+    [0, 4, 0, 0, 0, 0, 0, 0, 0],
+    [5, 0, 8, 0, 0, 2, 9, 0, 0],
+    [0, 0, 0, 0, 0, 8, 2, 0, 5],
+    [9, 0, 0, 0, 0, 7, 0, 0, 0],
+    [0, 5, 0, 3, 0, 0, 7, 0, 0],
+    [0, 0, 0, 0, 0, 0, 8, 1, 0]
+]
 
-#tworzenie okna
-screen = pygame.display.set_mode((width, height))
 
-# title and icon
-pygame.display.set_caption("Sudoku")
-icon = pygame.image.load("icon.png")
-pygame.display.set_icon(icon)
+def draw_board(board):
+    for row in range(len(board[0])):
+        print()
+        if row % 3 == 0 and row != 0:
+            print("- - - - - - - - - - -")
+        for col in range(len(board[0])):
+            if col % 3 == 0 and col != 0:
+                print("| ", end="")
+            print(str(board[row][col]) + " ", end="")
 
-screen.fill(("white"))
-# pygame.draw.line(screen, "black", (10, 10), (300, 300), 10)
 
-def draw_board():
-    for nr_linii in range(0, 10):
-        line_thickness = 2
-        if nr_linii % 3 == 0:
-            line_thickness = 4
-        # poziome linie
-        pygame.draw.line(screen, "black", (0, nr_linii*square), (width, nr_linii*square), line_thickness)
-        # pionowe linie
-        pygame.draw.line(screen, "black", (nr_linii * square, 0), (nr_linii * square, square*9), line_thickness)
+def empty_space_finder(board):
+    for row in range(9):
+        if 0 in board[row]:
+            posXofEmpty = board[row].index(0)
+            return row, posXofEmpty
+    return None
 
-draw_board()
-#game loop
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    # screen.fill(("white"))
-    pygame.display.update()
+
+def check_if_can_fit(board, numToCheck, posX, posY):
+    if numToCheck in board[posY]:
+        return False
+    for colToCheck in range(9):
+        if board[colToCheck][posX] == numToCheck:
+            return False
+    square = []
+    r = posY // 3
+    c = posX // 3
+    for row in range(r * 3, r * 3 + 3):
+        for col in range(c * 3, c * 3 + 3):
+            square.append(board[row][col])
+    if numToCheck in square:
+        return False
+    return True
+
+
+def solving_magic(board_to_solve):
+    location = empty_space_finder(board_to_solve)
+    if location is None:
+        draw_board(board_to_solve)
+        return False
+    emptyY, emptyX = location
+    for possible_num in range(1, 10):
+        if check_if_can_fit(board_to_solve, possible_num, emptyX, emptyY):
+            board_to_solve[emptyY][emptyX] = possible_num
+            if solving_magic(board_to_solve):
+                return True
+            board_to_solve[emptyY][emptyX] = 0
+    return False
+
+
+def unnecesary_function():
+    print("\n\nSolving magic happening...")
+    time.sleep(1)
+    print("Still going...")
+    time.sleep(1)
+    print("Almost there...")
+    time.sleep(1)
+    print("Done!")
+
+draw_board(sudoku_board)
+unnecesary_function()
+solving_magic(sudoku_board)
